@@ -1,8 +1,13 @@
 import { Link } from 'react-router'
+import BotaoAdicionar from './BotaoAdicionar'
 import { formatarPreco } from '../utils/formatarPreco'
+import { obterPrecoValido } from '../utils/preco'
 
 export default function ProdutoCard({ produto, onAdicionar }) {
-  const esgotado = produto.estoque === 0
+  const preco = obterPrecoValido(produto.price)
+  const precoOriginal = obterPrecoValido(produto.precoOriginal)
+  const temPromocao = precoOriginal !== null && preco !== null && precoOriginal > preco
+  const temAvaliacao = produto.rating && produto.rating.count > 0
 
   return (
     <article className="card">
@@ -13,25 +18,29 @@ export default function ProdutoCard({ produto, onAdicionar }) {
         <h3 className="card-titulo">{produto.title}</h3>
       </Link>
 
-      <p className="card-avaliacao">
-        ★ {produto.rating.rate} <span>({produto.rating.count} avaliações)</span>
-      </p>
+      {temAvaliacao && (
+        <p className="card-avaliacao">
+          ★ {produto.rating.rate} <span>({produto.rating.count} avaliações)</span>
+        </p>
+      )}
 
       <div className="card-precos">
-        {produto.precoOriginal && (
+        {temPromocao && (
           <span className="preco-original">{formatarPreco(produto.precoOriginal)}</span>
         )}
-        <span className="preco">{formatarPreco(produto.price)}</span>
+        {preco === null ? (
+          <span className="preco indisponivel">Preço indisponível</span>
+        ) : (
+          <span className="preco">{formatarPreco(preco)}</span>
+        )}
       </div>
 
       <div className="card-selos">
         {produto.price > 100 && <span className="selo selo-frete">Frete grátis</span>}
-        {esgotado && <span className="selo selo-esgotado">Esgotado</span>}
+        {Number(produto.estoque) <= 0 && <span className="selo selo-esgotado">Esgotado</span>}
       </div>
 
-      <button className="botao" onClick={() => onAdicionar(produto)} disabled={esgotado}>
-        Adicionar ao carrinho
-      </button>
+      <BotaoAdicionar key={produto.id} produto={produto} onAdicionar={onAdicionar} />
     </article>
   )
 }

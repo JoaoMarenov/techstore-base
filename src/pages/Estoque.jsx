@@ -1,7 +1,21 @@
+import { useState } from 'react'
+import { buscarAvisosReposicao } from '../utils/avisosReposicao'
+
 // Página usada pelo time de estoque para acompanhar a quantidade de cada produto
 export default function Estoque({ produtos }) {
+  const [avisos] = useState(() => buscarAvisosReposicao())
   // slice cria uma cópia, para o sort não alterar a lista original
   const ordenados = produtos.slice().sort((a, b) => a.estoque - b.estoque)
+  const grupos = avisos.reduce((resultado, aviso) => {
+    const produtoId = String(aviso.produtoId)
+    if (!resultado[produtoId]) resultado[produtoId] = []
+    resultado[produtoId].push(aviso)
+    return resultado
+  }, {})
+  const produtosAguardados = Object.entries(grupos).map(([produtoId, pessoas]) => {
+    const produto = produtos.find((item) => String(item.id) === produtoId)
+    return { id: produtoId, nome: produto ? produto.title : pessoas[0].produtoNome, pessoas }
+  })
 
   return (
     <section>
@@ -37,6 +51,29 @@ export default function Estoque({ produtos }) {
           </tbody>
         </table>
       </div>
+
+      <section className="secao-interessados">
+        <h2>Clientes aguardando reposição</h2>
+        {produtosAguardados.length === 0 ? (
+          <p className="aviso">Ainda não existem clientes aguardando reposição.</p>
+        ) : (
+          <div className="lista-interessados">
+            {produtosAguardados.map((grupo) => (
+              <article className="grupo-interessados" key={grupo.id}>
+                <h3>{grupo.nome}</h3>
+                <p>{grupo.pessoas.length} pessoa(s) aguardando</p>
+                <ul>
+                  {grupo.pessoas.map((pessoa, indice) => (
+                    <li key={`${pessoa.clienteEmail}-${indice}`}>
+                      <strong>{pessoa.clienteNome}</strong> · {pessoa.clienteEmail}
+                    </li>
+                  ))}
+                </ul>
+              </article>
+            ))}
+          </div>
+        )}
+      </section>
     </section>
   )
 }

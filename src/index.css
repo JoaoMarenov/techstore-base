@@ -399,6 +399,10 @@ h2 {
   color: var(--cor-destaque);
 }
 
+.indisponivel {
+  color: var(--cor-erro);
+}
+
 .card-selos {
   display: flex;
   flex-wrap: wrap;
@@ -458,6 +462,12 @@ h2 {
   border-color: var(--cor-moldura);
   color: var(--cor-texto-suave);
   cursor: not-allowed;
+}
+
+.mensagem-adicao {
+  color: var(--cor-texto-suave);
+  font-size: 0.75rem;
+  line-height: 1.3;
 }
 
 .botao-secundario {
@@ -571,6 +581,51 @@ h2 {
   font-size: 0.9rem;
   font-weight: 600;
   color: var(--cor-frete);
+}
+
+.detalhe-estoque.indisponivel {
+  color: var(--cor-erro);
+}
+
+.formulario-aviso {
+  display: grid;
+  gap: var(--espaco-2);
+  padding: var(--espaco-4);
+  background: var(--cor-fundo);
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio);
+}
+
+.formulario-aviso h2 {
+  margin: 0;
+  font-size: 1.05rem;
+}
+
+.formulario-aviso p {
+  margin: 0 0 var(--espaco-2);
+  color: var(--cor-texto-suave);
+  font-size: 0.9rem;
+}
+
+.formulario-aviso input {
+  width: 100%;
+  padding: var(--espaco-3);
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio-pequeno);
+  background: var(--cor-superficie);
+}
+
+.formulario-aviso .botao {
+  justify-self: start;
+}
+
+.mensagem-formulario {
+  color: var(--cor-frete) !important;
+  font-weight: 600;
+}
+
+.mensagem-formulario.erro {
+  color: var(--cor-erro) !important;
 }
 
 .detalhe-garantias {
@@ -821,6 +876,108 @@ h2 {
 
 .tabela tbody tr:last-child td {
   border-bottom: none;
+}
+
+.secao-interessados {
+  margin-top: var(--espaco-7);
+}
+
+.secao-interessados h2 {
+  margin-top: 0;
+}
+
+.lista-interessados {
+  display: grid;
+  gap: var(--espaco-4);
+}
+
+.grupo-interessados {
+  padding: var(--espaco-4);
+  background: var(--cor-superficie);
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio);
+}
+
+.grupo-interessados h3,
+.grupo-interessados p {
+  margin: 0 0 var(--espaco-2);
+}
+
+.grupo-interessados p,
+.grupo-interessados li {
+  color: var(--cor-texto-suave);
+  font-size: 0.9rem;
+}
+
+.grupo-interessados ul {
+  display: grid;
+  gap: var(--espaco-2);
+  margin: 0;
+  padding-left: var(--espaco-5);
+}
+
+.painel-topo {
+  padding: var(--espaco-5);
+  margin-bottom: var(--espaco-5);
+  background: var(--cor-superficie);
+  border: 1px solid var(--cor-borda);
+  border-left: 4px solid var(--cor-destaque);
+  border-radius: var(--raio);
+}
+
+.painel-topo h1,
+.painel-topo p:last-child {
+  margin-bottom: 0;
+}
+
+.painel-indicadores {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--espaco-4);
+}
+
+.painel-indicador {
+  display: grid;
+  gap: var(--espaco-2);
+  padding: var(--espaco-5);
+  background: var(--cor-superficie);
+  border: 1px solid var(--cor-borda);
+  border-radius: var(--raio);
+}
+
+.painel-indicador span {
+  color: var(--cor-texto-suave);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.painel-indicador strong {
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.painel-indicador small,
+.tabela-painel td small {
+  display: block;
+  color: var(--cor-texto-suave);
+  font-size: 0.75rem;
+  white-space: normal;
+}
+
+.painel-explicacao {
+  max-width: 80ch;
+  margin: calc(-1 * var(--espaco-2)) 0 var(--espaco-4);
+  color: var(--cor-texto-suave);
+  font-size: 0.9rem;
+}
+
+.lucro-indisponivel {
+  color: var(--cor-alerta);
+  font-weight: 700;
+}
+
+.painel-link-estoque {
+  margin-top: var(--espaco-5);
 }
 
 /* Rodapé */

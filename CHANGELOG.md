@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.5.0 (outubro de 2026)
+
+* Corrigido o cálculo do carrinho para preços numéricos e textuais e bloqueada a compra de produtos sem preço.
+* Produtos esgotados saíram da vitrine e ganharam solicitação local de aviso de reposição.
+* Adicionado o painel do lojista com indicadores de estoque, preços pendentes e interessados em reposição.
+
 ## 1.4.0 (setembro de 2026)
 
 * Novo visual do card de produto na lista, com avaliação e selos.

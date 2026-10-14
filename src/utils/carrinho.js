@@ -1,8 +1,29 @@
+import { obterPrecoValido } from './preco.js'
+
 // O carrinho guarda uma entrada por unidade adicionada.
 // Ex.: duas camisetas iguais = o mesmo produto duas vezes no array.
 
 export function calcularTotal(carrinho) {
-  return carrinho.reduce((total, produto) => total + produto.price, 0)
+  return carrinho.reduce((total, produto) => {
+    const preco = obterPrecoValido(produto.price)
+    return total + (preco === null ? 0 : preco)
+  }, 0)
+}
+
+export function calcularDesconto(subtotal, taxa) {
+  return Math.round((subtotal * taxa + Number.EPSILON) * 100) / 100
+}
+
+export function calcularTotalFinal(subtotal, desconto) {
+  return Math.max(0, Math.round((subtotal - desconto + Number.EPSILON) * 100) / 100)
+}
+
+export function calcularFreteGratis(totalFinal) {
+  const totalEmCentavos = Math.round(totalFinal * 100)
+  return {
+    liberado: totalEmCentavos > 20000,
+    falta: Math.max(0, (20001 - totalEmCentavos) / 100),
+  }
 }
 
 export function agruparItens(carrinho) {

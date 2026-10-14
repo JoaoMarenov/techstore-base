@@ -1,16 +1,16 @@
 # Regras de negócio
 
-Última atualização: março de 2026
+Última atualização: outubro de 2026
 
-## Frete grátis
+## Produtos esgotados e avisos
 
-Produtos com preço acima de R$ 100 têm frete grátis e exibem o selo "Frete grátis".
+Produtos sem estoque não aparecem na vitrine. Um acesso direto ao produto esgotado permite solicitar aviso de reposição, salvo no navegador.
 
 ## Cupons
 
 | Cupom | Desconto | Quem pode usar |
 |---|---|---|
-| `PRIMEIRACOMPRA` | 10% sobre o total | Qualquer cliente |
+| `PRIMEIRACOMPRA` | 10% sobre o total | Clientes sem pedidos anteriores |
 
 O cupom não diferencia letras maiúsculas e minúsculas.
 

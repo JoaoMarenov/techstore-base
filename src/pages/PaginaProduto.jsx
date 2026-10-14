@@ -1,8 +1,19 @@
+import { useState } from 'react'
 import { Link, useParams } from 'react-router'
+import BotaoAdicionar from '../components/BotaoAdicionar'
+import ProdutoCard from '../components/ProdutoCard'
+import { registrarAvisoReposicao } from '../utils/avisosReposicao'
+import { formatarPreco } from '../utils/formatarPreco'
+import { obterPrecoValido } from '../utils/preco'
+import { filtrarProdutosEmEstoque } from '../utils/produtos'
 
 export default function PaginaProduto({ produtos, onAdicionar }) {
   const { id } = useParams()
   const produto = produtos.find((item) => item.id === id)
+  const [nome, setNome] = useState('')
+  const [email, setEmail] = useState('')
+  const [mensagemAviso, setMensagemAviso] = useState('')
+  const [tipoMensagem, setTipoMensagem] = useState('')
 
   if (!produto) {
     return (
@@ -15,9 +26,38 @@ export default function PaginaProduto({ produtos, onAdicionar }) {
     )
   }
 
-  const relacionados = produtos
+  const esgotado = !(Number(produto.estoque) > 0)
+  const preco = obterPrecoValido(produto.price)
+  const relacionados = filtrarProdutosEmEstoque(produtos)
     .filter((item) => item.category === produto.category && item.id !== produto.id)
     .slice(0, 4)
+
+  function solicitarAviso(evento) {
+    evento.preventDefault()
+    const nomeLimpo = nome.trim()
+    const emailLimpo = email.trim()
+    const emailValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailLimpo)
+
+    if (!nomeLimpo || !emailValido) {
+      setTipoMensagem('erro')
+      setMensagemAviso('Informe um nome e um e-mail válido.')
+      return
+    }
+
+    const resultado = registrarAvisoReposicao(produto, nomeLimpo, emailLimpo)
+    if (resultado.sucesso) {
+      setTipoMensagem('sucesso')
+      setMensagemAviso('Solicitação registrada neste navegador.')
+      setNome('')
+      setEmail('')
+    } else if (resultado.duplicado) {
+      setTipoMensagem('erro')
+      setMensagemAviso('Este e-mail já está aguardando este produto.')
+    } else {
+      setTipoMensagem('erro')
+      setMensagemAviso('Não foi possível salvar o pedido neste navegador.')
+    }
+  }
 
   return (
     <section>
@@ -34,20 +74,57 @@ export default function PaginaProduto({ produtos, onAdicionar }) {
 
         <div className="detalhe-info">
           <h1>{produto.title}</h1>
-          <p className="card-avaliacao">
-            ★ {produto.rating.rate} <span>({produto.rating.count} avaliações)</span>
+          {produto.rating && produto.rating.count > 0 && (
+            <p className="card-avaliacao">
+              ★ {produto.rating.rate} <span>({produto.rating.count} avaliações)</span>
+            </p>
+          )}
+          <p className="detalhe-preco">
+            {preco === null ? 'Preço indisponível' : formatarPreco(preco)}
           </p>
-          <p className="detalhe-preco">R$ {produto.price.toFixed(2).replace('.', ',')}</p>
           <p className="detalhe-descricao">{produto.description}</p>
-          <p className="detalhe-estoque">{produto.estoque} unidades disponíveis</p>
+          <p className={esgotado ? 'detalhe-estoque indisponivel' : 'detalhe-estoque'}>
+            {esgotado ? 'Produto esgotado no momento.' : `${produto.estoque} unidades disponíveis`}
+          </p>
 
-          <button
+          <BotaoAdicionar
+            key={produto.id}
+            produto={produto}
+            onAdicionar={onAdicionar}
             className="botao botao-grande"
-            onClick={() => onAdicionar(produto)}
-            disabled={produto.estoque === 0}
-          >
-            Adicionar ao carrinho
-          </button>
+          />
+
+          {esgotado && (
+            <form className="formulario-aviso" onSubmit={solicitarAviso}>
+              <h2>Avise-me quando voltar</h2>
+              <p>Informe seu nome e e-mail. A solicitação fica salva neste navegador.</p>
+              <label className="rotulo" htmlFor="nome-aviso">Nome</label>
+              <input
+                id="nome-aviso"
+                value={nome}
+                onChange={(evento) => setNome(evento.target.value)}
+                autoComplete="name"
+                required
+              />
+              <label className="rotulo" htmlFor="email-aviso">E-mail</label>
+              <input
+                id="email-aviso"
+                type="email"
+                value={email}
+                onChange={(evento) => setEmail(evento.target.value)}
+                autoComplete="email"
+                required
+              />
+              <button className="botao botao-secundario" type="submit">
+                Solicitar aviso
+              </button>
+              {mensagemAviso && (
+                <p className={tipoMensagem === 'erro' ? 'mensagem-formulario erro' : 'mensagem-formulario'} role="status">
+                  {mensagemAviso}
+                </p>
+              )}
+            </form>
+          )}
 
           <ul className="detalhe-garantias">
             <li>Troca grátis em até 30 dias</li>
@@ -59,18 +136,7 @@ export default function PaginaProduto({ produtos, onAdicionar }) {
       <h2>Produtos relacionados</h2>
       <div className="grade">
         {relacionados.map((item) => (
-          <article key={item.id} className="card">
-            <Link to={`/produto/${item.id}`} className="card-link">
-              <div className="card-imagem-moldura">
-                <img src={item.image} alt={item.title} className="card-imagem" />
-              </div>
-              <h3 className="card-titulo">{item.title}</h3>
-            </Link>
-            <p className="preco">R$ {Number(item.price).toFixed(2).replace('.', ',')}</p>
-            <button className="botao" onClick={() => onAdicionar(item)}>
-              Adicionar ao carrinho
-            </button>
-          </article>
+          <ProdutoCard key={item.id} produto={item} onAdicionar={onAdicionar} />
         ))}
       </div>
     </section>

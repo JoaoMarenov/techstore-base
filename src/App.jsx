@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Routes, Route } from 'react-router'
 import Header from './components/Header'
 import Footer from './components/Footer'
@@ -7,8 +7,10 @@ import Loja from './pages/Loja'
 import PaginaProduto from './pages/PaginaProduto'
 import Carrinho from './pages/Carrinho'
 import Estoque from './pages/Estoque'
+import Painel from './pages/Painel'
 import { buscarProdutos } from './services/produtos'
 import { buscarClientes } from './services/clientes'
+import { produtoTemPreco } from './utils/preco'
 
 export default function App() {
   const [produtos, setProdutos] = useState([])
@@ -17,6 +19,7 @@ export default function App() {
   const [carrinho, setCarrinho] = useState([])
   const [clientes, setClientes] = useState([])
   const [clienteAtualId, setClienteAtualId] = useState(null)
+  const ultimosAdicionados = useRef({})
 
   useEffect(() => {
     buscarProdutos()
@@ -31,21 +34,29 @@ export default function App() {
   }, [])
 
   function adicionarAoCarrinho(produto) {
-    setCarrinho(carrinho.concat(produto))
+    if (!produtoTemPreco(produto) || !(Number(produto?.estoque) > 0)) return false
+
+    const agora = Date.now()
+    const ultimaAdicao = ultimosAdicionados.current[produto.id] || 0
+    if (agora - ultimaAdicao < 800) return false
+
+    ultimosAdicionados.current[produto.id] = agora
+    setCarrinho((itens) => itens.concat(produto))
+    return true
   }
 
   function removerUmaUnidade(produtoId) {
-    // Remove só a primeira unidade encontrada do produto
-    let removido = false
-    setCarrinho(
-      carrinho.filter((produto) => {
+    setCarrinho((itens) => {
+      // Remove só a primeira unidade encontrada do produto.
+      let removido = false
+      return itens.filter((produto) => {
         if (!removido && produto.id === produtoId) {
           removido = true
           return false
         }
         return true
       })
-    )
+    })
   }
 
   const clienteAtual = clientes.find((cliente) => cliente.id === clienteAtualId)
@@ -82,6 +93,7 @@ export default function App() {
               }
             />
             <Route path="/estoque" element={<Estoque produtos={produtos} />} />
+            <Route path="/painel" element={<Painel produtos={produtos} />} />
           </Routes>
         )}
       </main>
